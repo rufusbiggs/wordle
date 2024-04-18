@@ -2,9 +2,6 @@ import React from 'react'
 import styles from "./../page.module.css";
 
 const WordRow = ({ guessText, guessColor } : { guessText : string, guessColor : string[] }) => {
-    // create tiles inside row
-    // if guess is '' we want empty strings in each tile
-    // loop through letters in guess and display them in the tiles
     const tiles = [];
 
     for (let i = 0; i < 5; i++) {

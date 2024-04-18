@@ -14,7 +14,7 @@ import Keyboard from "./components/Keyboard";
 
 const WORD_LIST_API_URL = 'http://localhost:3001/words';
 
-interface words {
+interface Word {
   id: number,
   word: string
 }
@@ -26,18 +26,22 @@ export default function Home() {
   const [guessColors, setGuessColors] = useState(Array(6).fill(Array(5).fill('transparent')));
   const [charColors, setCharColors] = useState(Array(26).fill('transparent'));
   const [currentGuess, setCurrentGuess] = useState('');
+  const [gameOver, setGameOver] = useState(false);
+  const [lost, setLost] = useState(true);
+  const [guessCount, setGuessCount] = useState(0);
 
   const checkRowColors = (guess: string, solution: string): string[] => {
-    const guessColorsRow: string[] = Array(5).fill('grey');
+    const guessColorsRow = Array(5).fill('grey');
+    const upperCaseGuess = guess.toUpperCase();
     for (let i = 0; i < 5; i++) {
-        if (guess[i] == solution[i]) {
+        if (upperCaseGuess[i] == solution[i]) {
           guessColorsRow[i] = 'green';
         }
     }
     for (let i = 0; i < 5; i++) {
         if (guessColorsRow[i] !== 'green') {
             for (let j = 0; j < 5; j++) {
-                if (guess[i] == solution[j]) {
+                if (upperCaseGuess[i] == solution[j]) {
                   guessColorsRow[i] = 'orange';
                     break;
                 }
@@ -51,8 +55,9 @@ export default function Home() {
   const checkKeyboardColors = (guess: string, solution: string, letterColors: string[]): string[] => {
     const updatedLetterColors = letterColors;
     const alphabet = 'qwertyuiopasdfghjklzxcvbnm'.toUpperCase().split('');  
+    const upperCaseGuess = guess.toUpperCase();
     for (let i = 0; i < 5; i++) {
-      const letter = guess[i];
+      const letter = upperCaseGuess[i];
       const letterIndex = alphabet.findIndex(char => char == letter);
       if (letter == solution[i]) {
         updatedLetterColors[letterIndex] = 'green';
@@ -71,20 +76,40 @@ export default function Home() {
     return updatedLetterColors;
   }
 
+  const finishGame = (win = false) => {
+    setGameOver(true);
+    if (win) {
+      setLost(false);
+    }
+  }
+
 
   const updateGuesses = (guess: string, solution: string, charColors: string[]) => {
     const nextGuessIndex = guesses.findIndex(i => i === '');
     if (nextGuessIndex !== -1) {
+      // update guesses
       const guessesArray = [...guesses];
-      guessesArray[nextGuessIndex] = guess.toUpperCase();
+      guessesArray[nextGuessIndex] = guess;
       setGuesses(guessesArray);
+      // update row colors
       const guessColorsArray = [...guessColors];
-      guessColorsArray[nextGuessIndex] = checkRowColors(guess.toUpperCase(), solution);
+      guessColorsArray[nextGuessIndex] = checkRowColors(guess, solution);
       setGuessColors(guessColorsArray);
-      const colorsArray = checkKeyboardColors(guess.toUpperCase(), solution, charColors)
-      setCharColors(colorsArray);
+      // update keyboard colors
+      const keyboardColors = checkKeyboardColors(guess, solution, charColors)
+      setCharColors(keyboardColors);
+      // set number of guesses
+      const numberOfGuesses = guessCount;
+      setGuessCount(numberOfGuesses + 1);
+      // check if gameEnds
+      if (guess.toUpperCase() === solution) {
+        finishGame(true);
+      }
+      if (guessCount == 5) {
+        finishGame();
+      }
     } else {
-      console.log(`No more guesses!`);
+      finishGame();
     }
   }
 
@@ -95,7 +120,7 @@ export default function Home() {
         if (!response.ok) {
           throw new Error('Failed to fetch data!')
         }
-        const words : words[] = await response.json();
+        const words : Word[] = await response.json();
         const randomWord : string = words[Math.floor(Math.random() * words.length)].word;
         setSolution(randomWord);
         console.log(randomWord)
@@ -132,7 +157,6 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      {/* map over guesses */}
       {guesses.map((guess, i) => {
         const isCurrentGuess = i === guesses.findIndex(word => word == '');
         return (
@@ -142,7 +166,9 @@ export default function Home() {
           />
         )
       })}
+      {gameOver ? lost ? <div>The word was {solution}</div> : <div>Congratulations!</div> : <div></div>}
       <Keyboard keyboardColors = {charColors}/>
+      {charColors.map(color => <div>{color}</div>)}
     </main>
   );
 }

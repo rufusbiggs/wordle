@@ -15,7 +15,6 @@ const Keyboard = ({keyboardColors} : {keyboardColors: string[]}) => {
         const buttonStyle = {
             backgroundColor: keyboardColors[i]
         }
-
         if (i < 10) {
             topRow.push(<div className={styles.button} style={buttonStyle} key={i}>{topRowChar[i]}</div>)
         }
