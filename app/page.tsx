@@ -27,17 +27,16 @@ export default function Home() {
 
   const checkGuess = (guess: string, solution: string): string[] => {
     const guessColors: string[] = Array(5).fill('grey');
-
     for (let i = 0; i < 5; i++) {
-        if (guess[i] === solution[i]) {
+        if (guess[i] == solution[i]) {
             guessColors[i] = 'green';
         }
     }
     for (let i = 0; i < 5; i++) {
         if (guessColors[i] !== 'green') {
             for (let j = 0; j < 5; j++) {
-                if (guess[i] === solution[j]) {
-                    guessColors[i] = 'yellow';
+                if (guess[i] == solution[j]) {
+                    guessColors[i] = 'orange';
                     break;
                 }
             }
@@ -52,10 +51,10 @@ export default function Home() {
     const nextGuessIndex = guesses.findIndex(i => i === '');
     if (nextGuessIndex !== -1) {
       const guessesArray = [...guesses];
-      guessesArray[nextGuessIndex] = guess;
+      guessesArray[nextGuessIndex] = guess.toUpperCase();
       setGuesses(guessesArray);
       const guessColorsArray = [...guessColors];
-      guessColorsArray[nextGuessIndex] = checkGuess(guess, solution);
+      guessColorsArray[nextGuessIndex] = checkGuess(guess.toUpperCase(), solution);
       setGuessColors(guessColorsArray);
     } else {
       console.log(`No more guesses!`);
@@ -87,12 +86,6 @@ export default function Home() {
         if (currentGuess.length !== 5) {
           return;
         }
-        /** do the check answer thing 
-         * Set Guesses[i] to be input
-         * Check if guess is same as solution (text transform)
-         * Turn tiles the nexessary colors
-         * Move on if not the solution
-        */
         updateGuesses(currentGuess, solution);
         setCurrentGuess('');
       }
@@ -108,14 +101,7 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyPress);
 
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess])
-
-  // keyboard effect! Function for handling typing, event will be the keyboard press.
-  // if event.key == 'Enter' then the guess should be submitted
-  // setCurrentGuess(oldGuess => oldGuess + event.key)
-  // window.addEventListener('keydown', handleType);
-  //
-  // return () => window.removeEventListener('keydown', handleType);
+  }, [currentGuess, solution, guesses])
 
   return (
     <main className={styles.main}>
@@ -129,12 +115,6 @@ export default function Home() {
           />
         )
       })}
-      {guessColors.map(colors => {
-        return (
-          <div>{colors}</div>
-        )
-      })}
-      <p>{solution}</p>
     </main>
   );
 }
