@@ -53,22 +53,19 @@ export default function Home() {
   }
 
   const checkKeyboardColors = (guess: string, solution: string, letterColors: string[]): string[] => {
-    const updatedLetterColors = letterColors;
+    const updatedLetterColors = [...letterColors];
     const alphabet = 'qwertyuiopasdfghjklzxcvbnm'.toUpperCase().split('');  
     const upperCaseGuess = guess.toUpperCase();
     for (let i = 0; i < 5; i++) {
       const letter = upperCaseGuess[i];
-      const letterIndex = alphabet.findIndex(char => char == letter);
-      if (letter == solution[i]) {
+      const letterIndex = alphabet.findIndex(char => char === letter);
+      if (letter === solution[i]) {
         updatedLetterColors[letterIndex] = 'green';
       }
-      else if (letter !== solution[i]) {
-        for (let j = 0; j < 5; j++) {
-          if (letter == solution[j]) {
-            updatedLetterColors[letterIndex] = 'orange';
-            break;
-          }
-        }
+      else if (solution.includes(letter)) {
+        updatedLetterColors[letterIndex] = 'orange';
+      }
+      else {
         updatedLetterColors[letterIndex] = 'grey';
       }
     }
@@ -168,7 +165,6 @@ export default function Home() {
       })}
       {gameOver ? lost ? <div>The word was {solution}</div> : <div>Congratulations!</div> : <div></div>}
       <Keyboard keyboardColors = {charColors}/>
-      {charColors.map(color => <div>{color}</div>)}
     </main>
   );
 }
