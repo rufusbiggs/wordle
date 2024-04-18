@@ -8,8 +8,8 @@ const WordRow = ({ guessText, guessColor } : { guessText : string, guessColor : 
     const tiles = [];
 
     for (let i = 0; i < 5; i++) {
-        const char = guessText[i];
-        const color = guessColor[i];
+        const char = guessText[i]
+        const color = guessColor[i]
 
         const tileStyle = {
           backgroundColor: color

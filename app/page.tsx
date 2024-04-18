@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import WordRow from "./components/WordRow";
 import styles from "./page.module.css";
+import Keyboard from "./components/Keyboard";
 
 /** MAYBE I COULD ADD A COOL THING WHICH GIVES YOU AN AI HINT! 
  * 
- * 
- * Remember to spin up mock API!!!!!
- * 
+ * Instructions: 
+ * * Spin up mock API - npm run mock-api
+ * * Run app - npm run dev
  * 
 */
 
@@ -23,39 +24,65 @@ export default function Home() {
   const [solution, setSolution] = useState('');
   const [guesses, setGuesses] = useState(Array(6).fill(''));
   const [guessColors, setGuessColors] = useState(Array(6).fill(Array(5).fill('transparent')));
+  const [charColors, setCharColors] = useState(Array(26).fill('transparent'));
   const [currentGuess, setCurrentGuess] = useState('');
 
-  const checkGuess = (guess: string, solution: string): string[] => {
-    const guessColors: string[] = Array(5).fill('grey');
+  const checkRowColors = (guess: string, solution: string): string[] => {
+    const guessColorsRow: string[] = Array(5).fill('grey');
     for (let i = 0; i < 5; i++) {
         if (guess[i] == solution[i]) {
-            guessColors[i] = 'green';
+          guessColorsRow[i] = 'green';
         }
     }
     for (let i = 0; i < 5; i++) {
-        if (guessColors[i] !== 'green') {
+        if (guessColorsRow[i] !== 'green') {
             for (let j = 0; j < 5; j++) {
                 if (guess[i] == solution[j]) {
-                    guessColors[i] = 'orange';
+                  guessColorsRow[i] = 'orange';
                     break;
                 }
             }
         }
     }
 
-    return guessColors;
+    return guessColorsRow;
+  }
+
+  const checkKeyboardColors = (guess: string, solution: string, letterColors: string[]): string[] => {
+    const updatedLetterColors = letterColors;
+    const alphabet = 'qwertyuiopasdfghjklzxcvbnm'.toUpperCase().split('');  
+    for (let i = 0; i < 5; i++) {
+      const letter = guess[i];
+      const letterIndex = alphabet.findIndex(char => char == letter);
+      if (letter == solution[i]) {
+        updatedLetterColors[letterIndex] = 'green';
+      }
+      else if (letter !== solution[i]) {
+        for (let j = 0; j < 5; j++) {
+          if (letter == solution[j]) {
+            updatedLetterColors[letterIndex] = 'orange';
+            break;
+          }
+        }
+        updatedLetterColors[letterIndex] = 'grey';
+      }
+    }
+
+    return updatedLetterColors;
   }
 
 
-  const updateGuesses = (guess: string, solution: string) => {
+  const updateGuesses = (guess: string, solution: string, charColors: string[]) => {
     const nextGuessIndex = guesses.findIndex(i => i === '');
     if (nextGuessIndex !== -1) {
       const guessesArray = [...guesses];
       guessesArray[nextGuessIndex] = guess.toUpperCase();
       setGuesses(guessesArray);
       const guessColorsArray = [...guessColors];
-      guessColorsArray[nextGuessIndex] = checkGuess(guess.toUpperCase(), solution);
+      guessColorsArray[nextGuessIndex] = checkRowColors(guess.toUpperCase(), solution);
       setGuessColors(guessColorsArray);
+      const colorsArray = checkKeyboardColors(guess.toUpperCase(), solution, charColors)
+      setCharColors(colorsArray);
     } else {
       console.log(`No more guesses!`);
     }
@@ -86,7 +113,7 @@ export default function Home() {
         if (currentGuess.length !== 5) {
           return;
         }
-        updateGuesses(currentGuess, solution);
+        updateGuesses(currentGuess, solution, charColors);
         setCurrentGuess('');
       }
       else if (event.key === 'Backspace') {
@@ -101,7 +128,7 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyPress);
 
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess, solution, guesses])
+  }, [currentGuess, solution, guesses, charColors])
 
   return (
     <main className={styles.main}>
@@ -115,6 +142,7 @@ export default function Home() {
           />
         )
       })}
+      <Keyboard keyboardColors = {charColors}/>
     </main>
   );
 }
