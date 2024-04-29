@@ -150,7 +150,7 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyPress);
 
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess, solution, guesses, charColors])
+  }, [currentGuess, solution, guesses, charColors, updateGuesses])
 
   return (
     <main className={styles.main}>
@@ -158,6 +158,7 @@ export default function Home() {
         const isCurrentGuess = i === guesses.findIndex(word => word == '');
         return (
           <WordRow 
+            key={i}
             guessText = {isCurrentGuess ? currentGuess : guess} 
             guessColor = {guessColors[i]}
           />
