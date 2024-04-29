@@ -13,6 +13,7 @@ import Keyboard from "./components/Keyboard";
 */
 
 const WORD_LIST_API_URL = 'http://localhost:3001/words';
+import data from '../db.json';
 
 interface Word {
   id: number,
@@ -112,18 +113,21 @@ export default function Home() {
 
   useEffect(() => {
     const startGame = async () => {
-      try {
-        const response = await fetch(WORD_LIST_API_URL);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data!')
-        }
-        const words : Word[] = await response.json();
-        const randomWord : string = words[Math.floor(Math.random() * words.length)].word;
-        setSolution(randomWord);
-        console.log(randomWord)
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
+      // try {
+      //   const response = await fetch(WORD_LIST_API_URL);
+      //   if (!response.ok) {
+      //     throw new Error('Failed to fetch data!')
+      //   }
+      //   const words : Word[] = await response.json();
+      //   const randomWord : string = words[Math.floor(Math.random() * words.length)].word;
+      //   setSolution(randomWord);
+      //   console.log(randomWord)
+      // } catch (error) {
+      //   console.error('Error fetching data: ', error);
+      // }
+      const words : Word[] = data.words;
+      const randomWord : string = words[Math.floor(Math.random() * words.length)].word;
+      setSolution(randomWord);
     }
 
     startGame();
